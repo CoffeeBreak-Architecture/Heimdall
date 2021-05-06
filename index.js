@@ -11,8 +11,12 @@ const cors = require('cors');
 const { allowedNodeEnvironmentFlags } = require("process");
 const axios = require("axios").default;
 
-const rooms = require('./rooms')(io)
-const signalling = require('./signalling')(io)
+const clientMap = require('./clientMap')
+const rooms = require('./rooms')
+const signalling = require('./signalling')
+
+rooms.init(io, app)
+signalling.init(io)
 
 http.listen("3001", () => {
     console.log("Heimdall is running!")
