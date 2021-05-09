@@ -1,25 +1,26 @@
 const clientMap = require('./clientMap')
 
 const namespaceName = 'signalling'
-var namespace;
+var signalling;
 
 module.exports = {
     init: function(io) {
-        namespace = io.of('/' + namespaceName)
+        signalling = io.of('/' + namespaceName)
         console.log(namespaceName + " initialized..")
     
-        io.on('connection', socket => {
+        signalling.on('connection', socket => {
 
             socket.on('login', clientId => {
                 clientMap.addClient(clientId, socket.id, namespaceName)
             })
 
-            socket.on('message', message => {
-                socketId = clientMap.getSocketId(message.to, namespaceName)
-                io.to(socketId).emit('message', message)
+            socket.on('message', async message => {
+                socketId = await clientMap.getSocketId(message.to, namespaceName)
+                console.log('sending message to ' + socketId)
+                signalling.to(socketId).emit('message', message)
             })
         })
     
-        return namespace
+        return signalling
     }
 }

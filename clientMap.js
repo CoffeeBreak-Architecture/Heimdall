@@ -35,6 +35,7 @@ module.exports = {
 
     getSocketId: async function (clientId, namespace) {
         const rows = await databaseQuery('SELECT socketId FROM clientSocketIdMap WHERE clientId = ? AND namespace = ?', [clientId, namespace])
+        console.log(rows)
         if (rows.length == 1) {
             return await rows[0].socketId
         }
