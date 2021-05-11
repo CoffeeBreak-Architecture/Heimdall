@@ -15,6 +15,10 @@ const clientMap = require('./clientMap')
 const rooms = require('./rooms')
 const signalling = require('./signalling')
 
+app.get("/", (req, res) => {
+    res.send("Test");
+})
+
 rooms.init(io, app)
 signalling.init(io)
 

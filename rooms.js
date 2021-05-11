@@ -42,8 +42,8 @@ module.exports = {
 
             socket.on('onMovePlayer', async movement => {
                 let clientId = await clientMap.getClientId(socket.id)
-                await axios.patch(process.env.USER_REPOSITORY + '/users/' + clientId + '/position', {x: movement.x, y: movement.y})
-                let nearby = (await axios.get (process.env.USER_REPOSITORY + '/users/' + clientId + '/nearby/' + 512)).data
+                await axios.patch(process.env.USER_REPOSITORY + '/users/position', {x: movement.x, y: movement.y, clientId, clientId})
+                let nearby = (await axios.post (process.env.USER_REPOSITORY + '/users/nearby', {userId: clientId, threshold: nearbyThreshold})).data
                 console.log(nearby)
 
                 roomio.to(rid).emit('onMovePlayer', {id: clientId, x: movement.x, y: movement.y})
@@ -52,13 +52,13 @@ module.exports = {
 
             socket.on('onNameChanged', async name => {
                 let clientId = await clientMap.getClientId(socket.id)
-                await axios.patch(process.env.USER_REPOSITORY + '/users/' + clientId + '/nickname', {nickname: name})
+                await axios.patch(process.env.USER_REPOSITORY + '/users/nickname', {nickname: name, clientId: clientId})
                 roomio.to(rid).emit('onNameChanged', {id: clientId, name: name})
             })
 
             socket.on('disconnect', async () => {
                 let clientId = await clientMap.getClientId(socket.id)
-                await axios.delete(process.env.USER_REPOSITORY + '/users/' + clientId)
+                await axios.delete(process.env.USER_REPOSITORY + '/users/user/' + clientId)
                 roomio.to(rid).emit('onUserDisconnected', clientId)
             })
         })
