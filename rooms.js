@@ -44,7 +44,6 @@ module.exports = {
                 let clientId = await clientMap.getClientId(socket.id)
                 await axios.patch(process.env.USER_REPOSITORY + '/users/position', {x: movement.x, y: movement.y, clientId, clientId})
                 let nearby = (await axios.post (process.env.USER_REPOSITORY + '/users/nearby', {userId: clientId, threshold: nearbyThreshold})).data
-                console.log(nearby)
 
                 roomio.to(rid).emit('onMovePlayer', {id: clientId, x: movement.x, y: movement.y})
                 socket.emit('nearby', {nearby: nearby, threshold: nearbyThreshold})

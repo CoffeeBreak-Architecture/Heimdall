@@ -4,20 +4,18 @@ mysql = require('mysql2')
 const createTableQuery = 'CREATE TABLE IF NOT EXISTS clientSocketIdMap ( socketId VARCHAR(24) PRIMARY KEY, clientId CHAR(36), namespace VARCHAR(32) )'
 
 // This section of code repeats in several services that access databases. Could it be turned into a reusable mordule? Repeating code is a big no-no, but the benifit and complexity of extracting something so specific to it's use case might not be worth it.
-const con = mysql.createConnection({
+const con = mysql.createPool ({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
-})
-
-con.connect(async function(error) {
-    if (error) {
-       throw error
-    } else await initalizeDatabase()
+    database: process.env.MYSQL_DATABASE,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 })
 
 databaseQuery = function (query, args) { return util.promisify(con.query).call(con, query, args) }
+initalizeDatabase()
 
 async function initalizeDatabase () {
     console.log(createTableQuery)
@@ -35,7 +33,6 @@ module.exports = {
 
     getSocketId: async function (clientId, namespace) {
         const rows = await databaseQuery('SELECT socketId FROM clientSocketIdMap WHERE clientId = ? AND namespace = ?', [clientId, namespace])
-        console.log(rows)
         if (rows.length == 1) {
             return await rows[0].socketId
         }
