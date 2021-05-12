@@ -1,5 +1,6 @@
 const clientMap = require('./clientMap')
-const axios = require("axios");
+const roomRepo = require('./roomRepo')
+const userRepo = require('./userRepo')
 
 const namespaceName = 'rooms'
 const nearbyThreshold = 512
@@ -17,17 +18,16 @@ module.exports = {
             socket.on('login', async (nickname, roomId) => {
 
                 try {
-                    let newClient = (await axios.post(process.env.USER_REPOSITORY + '/users', {nickname: nickname, roomId: roomId})).data
+                    let newClient = await userRepo.addUser(nickname, roomId)
+                    let room = await roomRepo.getRoom(roomId)
                     let clientId = newClient.id
-
                     rid = roomId
 
                     clientMap.addClient(clientId, socket.id, namespaceName)
-
-                    let members = (await axios.get(process.env.USER_REPOSITORY + '/users/members/' + rid)).data
+                    let members = userRepo.getMembers(roomId)
 
                     socket.join(rid)
-                    socket.emit('onLoggedIn', {self: newClient, all: members})
+                    socket.emit('onLoggedIn', {room: room, self: newClient, all: members})
                     roomio.to(rid).emit('onUserConnected', newClient)
             
                     console.log(clientId + " succesfully logged in to room " + rid)
@@ -42,8 +42,8 @@ module.exports = {
 
             socket.on('onMovePlayer', async movement => {
                 let clientId = await clientMap.getClientId(socket.id)
-                await axios.patch(process.env.USER_REPOSITORY + '/users/position', {x: movement.x, y: movement.y, clientId, clientId})
-                let nearby = (await axios.post (process.env.USER_REPOSITORY + '/users/nearby', {userId: clientId, threshold: nearbyThreshold})).data
+                userRepo.setPosition(clientId, movement)
+                let nearby = userRepo.getNearby(clientId, nearbyThreshold)
 
                 roomio.to(rid).emit('onMovePlayer', {id: clientId, x: movement.x, y: movement.y})
                 socket.emit('nearby', {nearby: nearby, threshold: nearbyThreshold})
@@ -51,13 +51,15 @@ module.exports = {
 
             socket.on('onNameChanged', async name => {
                 let clientId = await clientMap.getClientId(socket.id)
-                await axios.patch(process.env.USER_REPOSITORY + '/users/nickname', {nickname: name, clientId: clientId})
+                await userRepo.setName(clientId, name)
+
                 roomio.to(rid).emit('onNameChanged', {id: clientId, name: name})
             })
 
             socket.on('disconnect', async () => {
                 let clientId = await clientMap.getClientId(socket.id)
-                await axios.delete(process.env.USER_REPOSITORY + '/users/user/' + clientId)
+                await userRepo.deleteUser(clientId)
+
                 roomio.to(rid).emit('onUserDisconnected', clientId)
             })
         })

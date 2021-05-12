@@ -1,9 +1,18 @@
 {
   "dependencies": {
-    "axios": "^0.21.1",
     "cors": "^2.8.5",
+    "dotenv": "^9.0.2",
     "express": "^4.17.1",
     "mysql2": "^2.2.5",
     "socket.io": "^4.0.1"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec -r dotenv/config"
+  },
+  "devDependencies": {
+    "axios": "^0.21.1",
+    "chai": "^4.3.4",
+    "devenv": "^1.0.1",
+    "mocha": "^8.4.0"
   }
 }
