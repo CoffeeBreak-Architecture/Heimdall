@@ -24,7 +24,7 @@ module.exports = {
                     rid = roomId
 
                     clientMap.addClient(clientId, socket.id, namespaceName)
-                    let members = userRepo.getMembers(roomId)
+                    let members = await userRepo.getMembers(roomId)
 
                     socket.join(rid)
                     socket.emit('onLoggedIn', {room: room, self: newClient, all: members})
@@ -43,8 +43,7 @@ module.exports = {
             socket.on('onMovePlayer', async movement => {
                 let clientId = await clientMap.getClientId(socket.id)
                 userRepo.setPosition(clientId, movement)
-                let nearby = userRepo.getNearby(clientId, nearbyThreshold)
-
+                let nearby = await userRepo.getNearby(clientId, nearbyThreshold)
                 roomio.to(rid).emit('onMovePlayer', {id: clientId, x: movement.x, y: movement.y})
                 socket.emit('nearby', {nearby: nearby, threshold: nearbyThreshold})
             })
