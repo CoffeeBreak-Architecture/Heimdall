@@ -12,9 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      ROOM_REPOSITORY_URL: http://localhost:3011
-      USER_REPOSITORY_URL: http://localhost:3010
-      SOCKET_SERVER_URL: http://lolcahost:3001
+      ROOM_REPOSITORY: http://localhost:3011
+      USER_REPOSITORY: http://localhost:3010
       MYSQL_HOST: localhost
       MYSQL_USER: root
       MYSQL_PASSWORD: root
