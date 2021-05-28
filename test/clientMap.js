@@ -39,7 +39,7 @@ describe('Client map', function () {
     it ('removeClient', async function () {
         await map.addClient('someClientId', 'someSocketId', 'someNamespace')
         await map.removeClient('someSocketId', 'someNamespace')
-        let client = await map.getClientId('someOtherSocketId');
+        let client = await map.getClientId('someSocketId');
         expect(client).to.equal(undefined)
     })
 })
