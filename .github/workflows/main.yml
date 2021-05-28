@@ -56,7 +56,7 @@ jobs:
           cd muninn
           npm ci
           cd ..
-          cd yggdrasil
+          cd heimdall
           npm ci
           cd ..
        
