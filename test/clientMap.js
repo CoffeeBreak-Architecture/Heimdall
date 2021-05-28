@@ -8,6 +8,10 @@ describe('Client map', function () {
         await map.removeClient('someOtherSocketId', 'someOtherNamespace')
     })
 
+    this.afterAll('Dispose DB', function () {
+        map.disposeDatabase()
+    })
+
     it('addClient', async function () {
         expect(async () => await map.addClient('someClientId', 'someSocketId', 'someNamespace')).to.not.throw(Error)
     })

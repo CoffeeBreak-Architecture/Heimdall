@@ -14,7 +14,8 @@ const con = mysql.createPool ({
     queueLimit: 0
 })
 
-databaseQuery = function (query, args) { return util.promisify(con.query).call(con, query, args) }
+databaseQuery = util.promisify(con.query).bind(con)
+
 initalizeDatabase()
 
 async function initalizeDatabase () {
@@ -45,5 +46,9 @@ module.exports = {
     
     removeClient: async function (socketId, namespace) {
         await databaseQuery('DELETE FROM clientSocketIdMap WHERE socketId = ? AND namespace = ?', [socketId, namespace])
+    },
+
+    disposeDatabase: function () {
+        con.end()
     }
 }

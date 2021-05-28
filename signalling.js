@@ -16,7 +16,7 @@ module.exports = {
 
             socket.on('message', async message => {
                 socketId = await clientMap.getSocketId(message.to, namespaceName)
-                console.log('sending message to ' + socketId)
+                console.log('sending ' + message.message.type + ' type message to ' + message.to + ' from ' + message.from)
                 signalling.to(socketId).emit('message', message)
             })
         })
