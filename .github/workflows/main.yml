@@ -1,0 +1,70 @@
+name: Node.js Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    
+    env:
+      ROOM_REPOSITORY: http://localhost:3011
+      USER_REPOSITORY: http://localhost:3010
+      MYSQL_HOST: localhost
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: coffeebreak
+    
+    steps:
+      - name: Set up MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
+    
+      - name: Fetch Heimdall
+        uses: actions/checkout@v2
+        with: 
+          path: 'heimdall'
+        
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12
+          
+      - name: Fetch Huginn
+        uses: actions/checkout@v2
+        with:
+          repository: 'coffeebreak-architecture/huginn'
+          path: 'huginn'
+          
+      - name: Fetch Muninn
+        uses: actions/checkout@v2
+        with:
+          repository: 'coffeebreak-architecture/muninn'
+          path: 'muninn'
+       
+      - name: npm ci
+        run: |
+          cd huginn
+          npm ci
+          cd ..
+          cd muninn
+          npm ci
+          cd ..
+          cd heimdall
+          npm ci
+          cd ..
+       
+      - name: Start services
+        run: | 
+          node huginn/index.js &
+          node muninn/index.js &
+          node heimdall/index.js &
+          
+      - run: |
+          cd heimdall
+          npm test

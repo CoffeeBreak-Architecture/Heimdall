@@ -42,7 +42,7 @@ module.exports = {
 
             socket.on('onMovePlayer', async movement => {
                 let clientId = await clientMap.getClientId(socket.id)
-                userRepo.setPosition(clientId, movement)
+                await userRepo.setPosition(clientId, movement)
                 let nearby = await userRepo.getNearby(clientId, nearbyThreshold)
                 roomio.to(rid).emit('onMovePlayer', {id: clientId, x: movement.x, y: movement.y})
                 socket.emit('nearby', {nearby: nearby, threshold: nearbyThreshold})
