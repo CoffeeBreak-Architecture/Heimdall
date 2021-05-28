@@ -29,7 +29,7 @@ jobs:
       - name: Fetch Heimdall
         uses: actions/checkout@v2
         with: 
-          path: 'yggdrasil'
+          path: 'heimdall'
         
       - name: Setup Node
         uses: actions/setup-node@v2
