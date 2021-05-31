@@ -7,6 +7,11 @@ const io = require('socket.io')(http, {
         methods: ["GET", "POST"]
     }
 });
+
+const redisAdapter = require('socket.io-redis');
+const redisHost = process.env.REDIS_HOST || 'localhost';
+io.adapter(redisAdapter({ host: redisHost, port: 6379 }));
+
 const cors = require('cors');
 const { allowedNodeEnvironmentFlags } = require("process");
 const axios = require("axios").default;

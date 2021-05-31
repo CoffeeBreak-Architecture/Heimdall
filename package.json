@@ -4,7 +4,8 @@
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
     "mysql2": "^2.2.5",
-    "socket.io": "^4.0.1"
+    "socket.io": "^4.0.1",
+    "socket.io-redis": "^6.1.1"
   },
   "scripts": {
     "test": "mocha --reporter spec -r dotenv/config"

@@ -12,12 +12,16 @@ module.exports = {
         console.log(namespaceName + " initialized..")
 
         roomio.on('connection', socket => {
-
+            console.log("connection")
             var rid = undefined
 
-            socket.on('login', async (nickname, roomId) => {
+            socket.on('login', async (nicknames) => {
 
                 try {
+                
+                    let nicknameRoomid = nicknames.split(":")
+                    let nickname = nicknameRoomid[0]
+                    let roomId = nicknameRoomid[1]
                     let newClient = await userRepo.addUser(nickname, roomId)
                     let room = await roomRepo.getRoom(roomId)
                     let clientId = newClient.id
@@ -31,6 +35,7 @@ module.exports = {
                     roomio.to(rid).emit('onUserConnected', newClient)
             
                     console.log(clientId + " succesfully logged in to room " + rid)
+                    io.emit("hello")
                 } catch(error) {
                     console.log(error)
                 }
