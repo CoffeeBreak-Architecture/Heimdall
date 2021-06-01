@@ -8,15 +8,6 @@ const io = require('socket.io')(http, {
     }
 });
 
-const redisAdapter = require('socket.io-redis');
-const redisHost = process.env.REDIS_HOST || 'localhost';
-io.adapter(redisAdapter({ host: redisHost, port: 6379 }));
-
-const cors = require('cors');
-const { allowedNodeEnvironmentFlags } = require("process");
-const axios = require("axios").default;
-
-const clientMap = require('./clientMap')
 const rooms = require('./rooms')
 const signalling = require('./signalling')
 
