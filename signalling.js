@@ -14,6 +14,7 @@ module.exports = {
                 clientMap.addClient(clientId, socket.id, namespaceName)
             })
 
+            // Recieve, figure out who to send it to through clientMap, send it to figured out person.
             socket.on('message', async message => {
                 socketId = await clientMap.getSocketId(message.to, namespaceName)
                 console.log('sending ' + message.message.type + ' type message to ' + message.to + ' from ' + message.from)

@@ -22,16 +22,21 @@ module.exports = {
                     let nicknameRoomid = nicknames.split(":")
                     let nickname = nicknameRoomid[0]
                     let roomId = nicknameRoomid[1]
+                    // Figure out client and room information.
                     let newClient = await userRepo.addUser(nickname, roomId)
                     let room = await roomRepo.getRoom(roomId)
                     let clientId = newClient.id
                     rid = roomId
 
+                    // Track client locally.
                     clientMap.addClient(clientId, socket.id, namespaceName)
                     let members = await userRepo.getMembers(roomId)
 
+                    // Join the client to the socket room.
                     socket.join(rid)
+
                     socket.emit('onLoggedIn', {room: room, self: newClient, all: members})
+                    // Notify everyone of login.
                     roomio.to(rid).emit('onUserConnected', newClient)
             
                     console.log(clientId + " succesfully logged in to room " + rid)
@@ -41,10 +46,12 @@ module.exports = {
                 }
             })
 
+            // Simple relay
             socket.on('onChatMessage', message => {
                 roomio.to(rid).emit('onChatMessage', message)
             })
 
+            // Update client position in database, relay to everyone in room.
             socket.on('onMovePlayer', async movement => {
                 let clientId = await clientMap.getClientId(socket.id)
                 await userRepo.setPosition(clientId, movement)
@@ -53,6 +60,7 @@ module.exports = {
                 socket.emit('nearby', {nearby: nearby, threshold: nearbyThreshold})
             })
 
+            // Update client name in database, relay to everonye in room.
             socket.on('onNameChanged', async name => {
                 let clientId = await clientMap.getClientId(socket.id)
                 await userRepo.setName(clientId, name)
@@ -60,6 +68,7 @@ module.exports = {
                 roomio.to(rid).emit('onNameChanged', {id: clientId, name: name})
             })
 
+            // Remove the client from databases and notify everyone of disconnect in room.
             socket.on('disconnect', async () => {
                 let clientId = await clientMap.getClientId(socket.id)
                 await userRepo.deleteUser(clientId)
