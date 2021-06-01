@@ -18,6 +18,7 @@ databaseQuery = util.promisify(con.query).bind(con)
 
 initalizeDatabase()
 
+// Initialize database with above createTableQuery query.
 async function initalizeDatabase () {
     console.log(createTableQuery)
     await databaseQuery(createTableQuery)
